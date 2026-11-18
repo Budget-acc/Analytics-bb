@@ -1,0 +1,20 @@
+{% comment %}
+Standard template - measurements page. Same structure and class names as the
+existing invoice's measurements page (BasePDFService.get_base_css() styles
+it), but key-value cards and per-person tables share one table style and the
+same fixed column widths. All data is autoescaped; client_info_html is built
+(escaped) by the renderer. The footer "Powered by" text is rendered on its own (every page,
+position: fixed), with or without a measurements page.
+{% endcomment %}
+{% if footer_text %}<div class="bb-footer-text">{{ footer_text }}</div>{% endif %}
+{% if measurements %}
+<div class="measurements-section">
+    <div style="break-inside: avoid; page-break-inside: avoid;">
+        <div class="measurements-title">PRODUCT MEASUREMENTS</div>
+        {% if client_info_html %}<div style="width:100%;margin-bottom:12px;font-size:11pt;">{{ client_info_html }}</div>{% endif %}
+        {% if staff_name %}<div style="width:100%;margin-bottom:12px;font-size:11pt;"><strong>Staff:</strong> {{ staff_name }}</div>{% endif %}
+        {% if blocks %}{% include "invoice_templates/standard/measurement_block.html" with block=blocks.0 %}{% endif %}
+    </div>
+    {% for block in blocks|slice:"1:" %}{% include "invoice_templates/standard/measurement_block.html" %}{% endfor %}
+</div>
+{% endif %}

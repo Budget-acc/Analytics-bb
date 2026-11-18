@@ -1,0 +1,22 @@
+from .base import ProductTransferViewSet
+from .match_product import match_product
+from .transfer_stock import transfer_stock
+from .transfer_history import transfer_history
+from .transfer_stats import transfer_stats
+from .helpers.source import _get_source_product_and_variant
+from .helpers.permission import _check_user_permission
+from .helpers.destination import _get_destination_service
+from .helpers.stock import _calculate_available_stock
+from .helpers.validators import _check_product_exists
+
+ProductTransferViewSet.match_product = match_product
+ProductTransferViewSet.transfer_stock = transfer_stock
+ProductTransferViewSet.transfer_history = transfer_history
+ProductTransferViewSet.transfer_stats = transfer_stats
+ProductTransferViewSet._get_source_product_and_variant = _get_source_product_and_variant
+ProductTransferViewSet._check_user_permission = _check_user_permission
+ProductTransferViewSet._get_destination_service = _get_destination_service
+ProductTransferViewSet._calculate_available_stock = _calculate_available_stock
+ProductTransferViewSet._check_product_exists = _check_product_exists
+
+__all__ = ["ProductTransferViewSet"]

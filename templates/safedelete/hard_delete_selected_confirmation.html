@@ -1,0 +1,29 @@
+{% extends "admin/base_site.html" %}
+{% load i18n l10n admin_urls %}
+
+{% block content %}
+<div class="content">
+    <h1>{% trans "Are you sure?" %}</h1>
+    <p>{% trans "You're about to permanently delete these items. This cannot be undone." %}</p>
+    
+    <h2>{% trans "Items to be deleted:" %}</h2>
+    <ul>
+        {% for obj in deletable_objects %}
+        <li>{{ obj }}</li>
+        {% endfor %}
+    </ul>
+
+    <form method="post">
+        {% csrf_token %}
+        <div>
+            {% for obj in deletable_objects %}
+            <input type="hidden" name="{{ action_checkbox_name }}" value="{{ obj.pk|unlocalize }}">
+            {% endfor %}
+            <input type="hidden" name="action" value="{{ action }}">
+            <input type="hidden" name="post" value="yes">
+            <input type="submit" value="{% trans 'Yes, I\'m sure' %}" class="button">
+            <a href="#" onclick="window.history.back(); return false;" class="button cancel-link">{% trans "No, take me back" %}</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,16 @@
+from .base import StaffEarningsViewSet
+from .helpers.validators import _validate_staff_exists
+from .helpers.time_utils import _get_target_year, _get_target_year_month
+from .helpers.data_fetchers import _get_staff_bookings_data, _get_staff_sales_data, _get_monthly_bookings, _get_monthly_sales
+from .get_earnings_report import get_earnings_report
+from .get_monthly_transactions import get_monthly_transactions
+
+StaffEarningsViewSet._validate_staff_exists = _validate_staff_exists
+StaffEarningsViewSet._get_target_year = _get_target_year
+StaffEarningsViewSet._get_target_year_month = _get_target_year_month
+StaffEarningsViewSet._get_staff_bookings_data = _get_staff_bookings_data
+StaffEarningsViewSet._get_staff_sales_data = _get_staff_sales_data
+StaffEarningsViewSet._get_monthly_bookings = _get_monthly_bookings
+StaffEarningsViewSet._get_monthly_sales = _get_monthly_sales
+StaffEarningsViewSet.get_earnings_report = get_earnings_report
+StaffEarningsViewSet.get_monthly_transactions = get_monthly_transactions

@@ -1,0 +1,83 @@
+{% comment %}
+Classic template - main content. All data is autoescaped; icon paths are
+static constants from the renderer.
+{% endcomment %}
+<table class="c-header">
+    <tr>
+        {% if show_logo and logo_left %}<td class="c-logo-cell left"><img src="{{ ctx.shop.logo }}" class="c-logo" /></td>{% endif %}
+        <td>
+            <div class="c-shop-name">{{ ctx.shop.name }}</div>
+            <div class="c-contact">
+                {% for line in contact_lines %}<div><svg class="c-icon" viewBox="0 0 24 24"><path fill="{{ icon_color }}" d="{{ line.icon }}"/></svg>{{ line.text }}</div>
+                {% endfor %}
+            </div>
+        </td>
+        {% if show_logo and not logo_left %}<td class="c-logo-cell right"><img src="{{ ctx.shop.logo }}" class="c-logo" /></td>{% endif %}
+    </tr>
+</table>
+
+<div class="c-title">{{ title }}</div>
+
+<table class="c-meta">
+    <tr>
+        <td>
+            <div class="c-section-heading{% if heading_text_color %} text-colored{% endif %}">{{ customer_label }}</div>
+            {% if ctx.party.name %}<div>{{ ctx.party.name }}</div>{% endif %}
+            {% if ctx.party.phone %}<div>{{ ctx.party.phone }}</div>{% endif %}
+            {% if ctx.party.address %}<div class="c-muted">{{ ctx.party.address }}</div>{% endif %}
+        </td>
+        <td class="right">
+            <div>{{ invoice_no_label }} <span class="c-strong">{{ ctx.invoice_no }}</span></div>
+            <div>{{ ctx.invoice_date }}</div>
+            {% if show_attender %}<div>{{ attender_label }} {{ ctx.staff_name }}</div>{% endif %}
+        </td>
+    </tr>
+</table>
+
+<table class="c-items">
+    <thead>
+        <tr>
+            {% for column in columns %}<th class="col-{{ column.key }}{% if column.css_class %} {{ column.css_class }}{% endif %}">{{ column.label }}</th>
+            {% endfor %}
+        </tr>
+    </thead>
+    <tbody>
+        {% for entry in items %}
+        <tr>
+            {% for column in columns %}
+            {% if column.key == "no" %}<td>{{ entry.item.no }}</td>
+            {% elif column.key == "item" %}<td>
+                {% if show_item_images and entry.image %}<table class="c-item-media"><tr><td><img src="{{ entry.image }}" class="c-item-img" /></td><td>{% endif %}
+                <div>{{ entry.item.name }}</div>
+                {% if entry.spec %}<div class="c-item-spec">{{ entry.spec }}</div>{% endif %}
+                {% if show_item_images and entry.image %}</td></tr></table>{% endif %}
+            </td>
+            {% elif column.key == "price" %}<td class="right">{{ entry.item.price }}</td>
+            {% elif column.key == "qty" %}<td class="center">{{ entry.item.quantity }}</td>
+            {% else %}<td class="right">{{ entry.item.amount }}</td>
+            {% endif %}
+            {% endfor %}
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<table class="c-summary">
+    <tr>
+        <td style="width: 50%; padding-right: 30px;">
+            <div class="c-section-heading{% if heading_text_color %} text-colored{% endif %}">{{ details_heading }}</div>
+            {% for line in ctx.info_lines %}<div class="c-details-line">{% if line.label %}{{ line.label }}: {% endif %}{{ line.value }}</div>
+            {% endfor %}
+        </td>
+        <td style="width: 50%;">
+            <table class="c-totals">
+                {% for entry in totals %}{% with row=entry.row %}
+                {% if row.kind == "divider" %}<tr class="divider"><td colspan="2"></td></tr>
+                {% elif row.kind == "note" %}<tr class="note"><td colspan="2">{{ row.label }}</td></tr>
+                {% elif row.kind == "cancelled" %}<tr class="cancelled"><td colspan="2">{{ entry.label }}</td></tr>
+                {% else %}<tr{% if entry.css %} class="{{ entry.css }}"{% endif %}><td>{{ entry.label }}</td><td class="val">{{ row.value }}</td></tr>
+                {% endif %}{% endwith %}{% endfor %}
+            </table>
+        </td>
+    </tr>
+</table>

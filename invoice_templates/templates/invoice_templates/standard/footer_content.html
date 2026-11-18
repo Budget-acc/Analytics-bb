@@ -1,0 +1,7 @@
+<div class="terms">
+    <div class="terms-title">{{ terms_title_html }}</div>
+    <div class="terms-list">
+        {% for term in ctx.terms %}<div>- {{ term }}</div>
+        {% endfor %}
+    </div>
+</div>

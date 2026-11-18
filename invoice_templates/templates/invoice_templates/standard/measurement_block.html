@@ -1,0 +1,37 @@
+{% comment %}
+One block of the Standard measurements page: a row of two key-value cards
+("pair") or one per-person table ("person"). Both use .measurements-table with
+the same fixed column widths; row shading is inline, as in the existing page.
+{% endcomment %}
+{% if block.kind == "pair" %}
+<div class="measurements-pair">
+    {% for heading, rows in block.cards %}
+    <div class="{% if forloop.first %}measurements-col-left{% else %}measurements-col-right{% endif %}">
+        <div class="variant-table-card">
+            <div class="variant-table-heading">{{ heading }}</div>
+            <table class="measurements-table" style="width:{{ measurements.card_width_px }}px;">
+                <colgroup><col style="width:{{ measurements.label_col_px }}px;"><col style="width:{{ measurements.value_col_px }}px;"></colgroup>
+                <thead><tr><th class="measurement-name">Measurement</th><th class="text-right size-col">Size</th></tr></thead>
+                <tbody>
+                    {% for r in rows %}{% with bg=forloop.counter0|divisibleby:2|yesno:"#FFFFFF,#F9FAFB" %}<tr><td style="background-color:{{ bg }};">{{ r.name }}</td><td class="text-right" style="background-color:{{ bg }};">{{ r.value }}</td></tr>{% endwith %}
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endfor %}
+    {% if block.cards|length == 1 %}<div class="measurements-col-right"></div>{% endif %}
+</div>
+{% else %}
+<div class="variant-table-card" style="width:{{ block.table.width_px }}px;">
+    {% if block.heading %}<div class="variant-table-heading">{{ block.heading }}</div>{% endif %}
+    <table class="measurements-table" style="width:{{ block.table.width_px }}px;">
+        <colgroup><col style="width:{{ measurements.label_col_px }}px;">{% for name in block.table.names %}<col style="width:{{ measurements.value_col_px }}px;">{% endfor %}</colgroup>
+        <thead><tr><th class="measurement-name">Measurements</th>{% for name in block.table.names %}<th class="text-right person-col">{{ name }}</th>{% endfor %}</tr></thead>
+        <tbody>
+            {% for row in block.table.rows %}{% with bg=forloop.counter0|divisibleby:2|yesno:"#FFFFFF,#F9FAFB" %}<tr><td style="background-color:{{ bg }};">{{ row.0 }}</td>{% for value in row|slice:"1:" %}<td class="text-right" style="background-color:{{ bg }};">{{ value }}</td>{% endfor %}</tr>{% endwith %}
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}

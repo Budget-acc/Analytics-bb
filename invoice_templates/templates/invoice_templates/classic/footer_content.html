@@ -1,0 +1,7 @@
+<div class="c-terms">
+    <div class="c-section-heading{% if heading_text_color %} text-colored{% endif %}">{{ terms_title }}</div>
+    <div class="c-terms-list">
+        {% for term in ctx.terms %}<div>&#8226; {{ term }}</div>
+        {% endfor %}
+    </div>
+</div>

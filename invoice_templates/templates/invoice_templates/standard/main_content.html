@@ -1,0 +1,82 @@
+{% comment %}
+Standard template - main content (header, invoice details, items, totals).
+Same structure and class names as the existing invoice in
+whatsapp_integration/v3/pdf_template.py so BasePDFService.get_base_css()
+applies unchanged. All data is autoescaped. The logo is the shop's own
+Shop.img (downloaded by the context builder).
+{% endcomment %}
+<div class="header">
+    {% if ctx.shop.logo %}<img src="{{ ctx.shop.logo }}" class="logo" />{% else %}<div class="empty-logo">No Logo</div>{% endif %}
+    <div class="shop-info">
+        <div class="shop-name">{{ shop_name_html }}</div>
+        <div class="shop-details">{{ shop_details_html }}</div>
+    </div>
+</div>
+
+<div class="invoice-section">
+    <div class="invoice-info">
+        <div class="invoice-row">
+            <span class="invoice-label">INVOICE ID:</span>
+            <span class="invoice-value">{{ ctx.invoice_no }}</span>
+        </div>
+        <div class="invoice-row">
+            <span class="invoice-label">DATE:</span>
+            <span class="invoice-value">{{ ctx.invoice_date }}</span>
+        </div>
+        {% if show_staff %}<div class="invoice-row"><span class="invoice-label">STAFF:</span><span class="invoice-value">{{ ctx.staff_name }}</span></div>{% endif %}
+    </div>
+    <div class="bill-to">
+        <div class="section-title">{{ bill_to_title }}</div>
+        <div class="bill-to-content">
+            {% for css_class, value, style in bill_to_rows %}<div class="{{ css_class }}"{% if style %} style="{{ style }}"{% endif %}>{{ value }}</div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<table>
+    <thead>
+        <tr>
+            {% for column in columns %}<th{% if column.width %} style="width: {{ column.width }};"{% endif %}{% if column.css_class %} class="{{ column.css_class }}"{% endif %}>{{ column.label }}</th>
+            {% endfor %}
+        </tr>
+    </thead>
+    <tbody>
+        {% for entry in items %}
+        <tr>
+            {% for column in columns %}
+            {% if column.key == "no" %}<td class="text-center">{{ entry.item.no }}</td>
+            {% elif column.key == "item" %}<td>
+                <div class="item-row">
+                    {% if entry.image_state == "img" %}<img src="{{ entry.image }}" class="item-image" alt="{{ entry.item.name }}" />{% elif entry.image_state == "invalid" %}<div class="empty-image">Invalid Image</div>{% else %}<div class="empty-image">No Image</div>{% endif %}
+                    <div class="item-details">
+                        <div class="item-name" style="{{ entry.name_style }}">{{ entry.item.name }}</div>
+                        {% for meta in entry.meta %}<div class="item-meta">{{ meta }}</div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </td>
+            {% elif column.key == "price" %}<td class="text-right">{{ entry.item.price }}</td>
+            {% elif column.key == "qty" %}<td class="text-center">{{ entry.item.quantity }}</td>
+            {% else %}<td class="amount-cell">{{ entry.item.amount }}</td>
+            {% endif %}
+            {% endfor %}
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<div class="totals-section">
+    <div class="order-info">
+        <div class="order-info-title">{{ info_title_html }}</div>
+        {% for line in ctx.info_lines %}<div class="order-info-item">{% if line.bold_label %}<strong>{{ line.label }}:</strong> {{ line.value }}{% elif line.label %}{{ line.label }}: {{ line.value }}{% else %}{{ line.value }}{% endif %}</div>
+        {% endfor %}
+    </div>
+    <div class="totals">
+        {% for entry in totals %}{% with row=entry.row %}
+        {% if row.kind == "divider" %}<div class="total-row subtotal-row status-header"><span class="total-value"></span></div>
+        {% elif row.kind == "note" %}<div style="font-size:7.5pt;color:{{ muted_color }};text-align:right;margin-top:0;">{{ row.label }}</div>
+        {% else %}<div class="total-row {{ entry.css }}"><span class="total-label">{{ entry.label }}</span><span class="total-value">{{ row.value }}</span></div>
+        {% endif %}{% endwith %}{% endfor %}
+    </div>
+</div>
