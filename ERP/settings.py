@@ -132,6 +132,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
+    "archive.middleware.AnalyticsReadOnlyMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -170,23 +171,22 @@ WSGI_APPLICATION = "ERP.wsgi.application"
 
 
 # Database
-# DATABASES = {
-#     "default": {
-#         "ENGINE": os.getenv("DB_ENGINE"),
-#         "NAME": os.getenv("DB_NAME"),
-#         "USER": os.getenv("DB_USER"),
-#         "PASSWORD": os.getenv("DB_PASSWORD"),
-#         "HOST": os.getenv("DB_HOST"),
-#         "PORT": os.getenv("DB_PORT", "5432"),
-#     }
-# }
-
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+if os.getenv("DB_ENGINE"):
+    DATABASES = {
+        "default": {
+            "ENGINE": os.getenv("DB_ENGINE"),
+            "NAME": os.getenv("DB_NAME"),
+            "USER": os.getenv("DB_USER"),
+            "PASSWORD": os.getenv("DB_PASSWORD"),
+            "HOST": os.getenv("DB_HOST"),
+            "PORT": os.getenv("DB_PORT", "5432"),
+        }
     }
-}
+elif DEBUG:
+    DATABASES = {"default": {"ENGINE": "django.db.backends.sqlite3", "NAME": BASE_DIR / "db.sqlite3"}}
+else:
+    raise RuntimeError("DB_ENGINE is not set in .env (needed on servers).")
+
 
 
 
@@ -683,6 +683,11 @@ BOOKING_ARCHIVE_PURGE_ENABLED = parse_env_bool("BOOKING_ARCHIVE_PURGE_ENABLED", 
 
 
 
+# ANALYTICS app only (false in the live app)
+ANALYTICS_MODE = parse_env_bool("ANALYTICS_MODE", False)
+ARCHIVE_IMPORT_PREFIX = os.getenv("ARCHIVE_IMPORT_PREFIX") or ARCHIVE_S3_PREFIX
+ARCHIVE_IMPORT_EVERY_MIN = int(os.getenv("ARCHIVE_IMPORT_EVERY_MIN", 30))
+
 
 
 # Celery Beat Schedule
@@ -764,6 +769,17 @@ CELERY_BEAT_SCHEDULE = {
 }
 
 
+
+# The analytics app runs ONLY the import job: no reminders, no WhatsApp, no archive job.
+if ANALYTICS_MODE:
+    CELERY_BEAT_SCHEDULE = {
+        "archive-import": {
+            "task": "archive.tasks.import_archive_batches",
+            "schedule": crontab(minute=f"*/{ARCHIVE_IMPORT_EVERY_MIN}"),
+        },
+    }
+
+    
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
