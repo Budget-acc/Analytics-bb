@@ -553,6 +553,20 @@ class UserProfileView(APIView, StandardResponseMixin):
         password_policy_qs = ShopFeaturePolicy.objects.filter(shop=shop, is_active=True)
         password_policy_map = {policy.feature: policy.require_password_for for policy in password_policy_qs}
 
+        # ANALYTICS app: no subscriptions here, so open every feature
+        if getattr(settings, "ANALYTICS_MODE", False):
+            subscription_data = {
+                "plan": "pro",
+                "status": "active",
+                "features_details": [
+                    {"code": f.code, "name": f.name, "status": "active", "limit_exceeded": None,
+                     "start_date": None, "end_date": None}
+                    for f in Feature.objects.all()
+                ],
+                "expiry_date": "31-12-2099",
+                "days_remaining": 9999,
+            }
+
         feature_descriptions = dict(FeatureKey.choices)
         password_settings = []
         for feature in FeatureKey.values:
