@@ -1,6 +1,6 @@
 from django.db.models import OuterRef, Q, Subquery, Sum
 from django.utils import timezone
-
+from django.conf import settings
 
 def get_feature_limit_status(shop_id, plan_id, feature_ids):
     """
@@ -19,6 +19,9 @@ def get_feature_limit_status(shop_id, plan_id, feature_ids):
     Exactly 3 queries total regardless of len(feature_ids) - no per-feature
     or per-shop query loop.
     """
+    if getattr(settings, "ANALYTICS_MODE", False):
+        return {}  # analytics app: no usage limits
+
     from .feature_usage_policy import FeatureUsagePolicy
     from .shop_feature_limit import ShopFeatureLimit
     from .shop_feature_usage import ShopFeatureUsage
@@ -75,6 +78,11 @@ def get_feature_limit_status(shop_id, plan_id, feature_ids):
 
 def has_feature_access(shop_user, feature_code, require_active_subscription=True, as_of=None):
     """Check if a shop user has access to a specific feature."""
+
+    if getattr(settings, "ANALYTICS_MODE", False):
+        return True  # analytics app: every feature is open
+
+
     try:
         if not hasattr(shop_user.shop, 'subscription'):
             return False

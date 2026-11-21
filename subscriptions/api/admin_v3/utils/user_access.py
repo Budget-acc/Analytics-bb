@@ -1,6 +1,6 @@
 # user_access.py
 from subscriptions.models import UserFeature, ShopUserFeature
-
+from django.conf import settings
 
 def has_user_feature_access(shop_user, feature_code):
     """
@@ -11,7 +11,8 @@ def has_user_feature_access(shop_user, feature_code):
     2. If no explicit override, check UserFeature based on role
     3. Return True only if explicitly granted or role has it by default
     """
-
+    if getattr(settings, "ANALYTICS_MODE", False):
+        return True
     # 1. First check for explicit ShopUserFeature override
     try:
         shop_user_feature = ShopUserFeature.objects.get(
@@ -37,6 +38,11 @@ def get_user_accessible_features(shop_user):
     Get all features accessible to a shop user.
     Returns a set of feature codes.
     """
+    if getattr(settings, "ANALYTICS_MODE", False):
+        from subscriptions.models import Feature
+        return set(Feature.objects.values_list("code", flat=True))
+
+
     accessible_features = set()
 
     # 1. Get features from ShopUserFeature (explicit grants)

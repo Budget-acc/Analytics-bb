@@ -1,7 +1,7 @@
 from django.db import models
 from safedelete.models import SafeDeleteModel, SOFT_DELETE
 from .feature import Feature
-
+from django.conf import settings
 
 class UserSubscriptionAccess(SafeDeleteModel):
     """Role-based access control within shop subscriptions"""
@@ -38,7 +38,12 @@ class UserSubscriptionAccess(SafeDeleteModel):
         return f"{self.shop_user} - Access Control"
 
     def get_accessible_features(self, as_of=None):
+
         """Get features this user can access"""
+
+        if getattr(settings, "ANALYTICS_MODE", False):
+            return list(Feature.objects.all())  # analytics app: all features
+
         shop_features = set(self.shop_user.shop.subscription.get_all_features(as_of=as_of))
         additional_features = set(self.allowed_features.all())
         restricted_features = set(self.restricted_features.all())
