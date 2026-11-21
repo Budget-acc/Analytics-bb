@@ -7,6 +7,7 @@ from rest_framework.permissions import BasePermission
 from shop.api.v3.utils.shop import get_active_shop_and_user
 from subscriptions.models import has_feature_access
 
+from django.conf import settings
 
 def _normalize_upper_set(values):
     if not values:
@@ -147,6 +148,9 @@ class SubscriptionActivePermission(BasePermission):
         return False
 
     def has_permission(self, request, view):
+        if getattr(settings, "ANALYTICS_MODE", False):
+            return True  # analytics app has no subscription data
+
         if view and self._is_exempt(request, view):
             return True
 
@@ -204,6 +208,8 @@ def FeaturePermissionFactory(feature_code):
         message = f"Feature {feature_code} not available."
 
         def has_permission(self, request, view):
+            if getattr(settings, "ANALYTICS_MODE", False):
+                return True
             try:
                 shop, shop_user = get_active_shop_and_user(request)
 

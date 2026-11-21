@@ -6,6 +6,7 @@ from rest_framework.exceptions import APIException
 from rest_framework import status
 from subscriptions.models import ShopFeatureSubscription, has_feature_access
 from .permissions import FeatureAccessException, _normalize_upper_set, _normalize_lower_set
+from django.conf import settings
 
 class RoleBasedException(APIException):
     status_code = status.HTTP_403_FORBIDDEN
@@ -41,6 +42,8 @@ class ShopRolePermission(BasePermission):
                 role=shop_user.role,
                 required_roles=self.allowed_roles
             )
+        if getattr(settings, "ANALYTICS_MODE", False):
+                return True  # skip feature/subscription checks in analytics
 
         return True
 
