@@ -73,9 +73,6 @@ class ArchiveBatch(models.Model):
         indexes = [models.Index(fields=["shop_id", "kind", "status"])]
 
     def __str__(self):
-<<<<<<< HEAD
-        return f"ArchiveBatch {self.id} shop={self.shop_id} {self.kind} [{self.status}]"
-=======
         return f"ArchiveBatch {self.id} shop={self.shop_id} {self.kind} [{self.status}]"
 
 
@@ -133,4 +130,3 @@ class ImportTableLog(models.Model):
 
     def __str__(self):
         return f"{self.table_name}: {self.rows_inserted} new, {self.rows_updated} updated"
->>>>>>> upstream/dev-2.0
