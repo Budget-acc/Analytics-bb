@@ -42,8 +42,6 @@ class ShopRolePermission(BasePermission):
                 role=shop_user.role,
                 required_roles=self.allowed_roles
             )
-        if getattr(settings, "ANALYTICS_MODE", False):
-                return True  # skip feature/subscription checks in analytics
 
         return True
 
@@ -149,6 +147,9 @@ def FeatureRolePermissionFactory(feature_code, allowed_roles=None):
                     role=shop_user.role,
                     required_roles=allowed_roles
                 )
+
+            if getattr(settings, "ANALYTICS_MODE", False):
+                return True  # analytics app: skip feature/subscription checks
 
             # Then check feature access
             if not has_feature_access(shop_user, feature_code, require_active_subscription=False):
