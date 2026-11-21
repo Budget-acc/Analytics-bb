@@ -72,16 +72,11 @@ def _serialize(model, objs):
             if fields.get(name):
                 ct = ContentType.objects.get_for_id(fields[name])
                 fields[name] = [ct.app_label, ct.model]  # natural key: IDs can differ between DBs
-<<<<<<< HEAD
-        if is_user and "password" in fields:
-            fields["password"] = "!"  # never copy password hashes to the analytics app
-=======
         if is_user:
             # never copy password hashes to the analytics app
             for secret in ("password", "secondary_password"):
                 if secret in fields:
                     fields[secret] = "!"
->>>>>>> upstream/dev-2.0
     return json.dumps(data, cls=DjangoJSONEncoder, ensure_ascii=False).encode("utf-8")
 
 

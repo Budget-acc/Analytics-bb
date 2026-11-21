@@ -95,13 +95,8 @@ DATE_FIELD = {
 }
 AMOUNT_FIELD = {
     "booking_v2_bookingv2": "total_amount",
-<<<<<<< HEAD
-    "booking_v2_paymentdetailsv2": "amount",
-    "booking_v2_refunddetails": "amount",
-=======
     "booking_v2_paymentdetailsv2": "payment_amount",
     "booking_v2_refunddetails": "refunded_amount",
->>>>>>> upstream/dev-2.0
     "sales_sale": "total_amount",
     "sales_salespaymentdetails": "payment_amount",
     "expenses_v2_expenses": "expense",

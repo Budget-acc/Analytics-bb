@@ -27,9 +27,6 @@ def run_nightly_archive(self, dry_run=False):
         run = run_archive(dry_run=dry_run)
         return {"run_id": run.id, "status": run.status}
     finally:
-<<<<<<< HEAD
-        cache.delete(LOCK_KEY)
-=======
         cache.delete(LOCK_KEY)
 
 
@@ -56,4 +53,3 @@ def import_archive_batches(self):
         return import_all(ArchiveBucket())
     finally:
         cache.delete(IMPORT_LOCK_KEY)
->>>>>>> upstream/dev-2.0
